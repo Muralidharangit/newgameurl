@@ -8,6 +8,7 @@ export const Registration: React.FC = () => {
   const navigate = useNavigate();
   const [setupCode, setSetupCode] = useState("WB-SHOP-4821");
   const [machineType, setMachineType] = useState<MachineType>("smart-pc");
+  const [isTerminalConfirmed, setIsTerminalConfirmed] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [wizardStep, setWizardStep] = useState<1 | 2>(1);
@@ -37,6 +38,12 @@ export const Registration: React.FC = () => {
     if (!inputCode) {
       setErrorMessage("Please enter a valid Setup Code.");
       showToast("Please enter a valid Setup Code!");
+      return;
+    }
+
+    if (machineType === "terminal" && !isTerminalConfirmed) {
+      setErrorMessage("Please confirm Bill / Ticket Terminal capability.");
+      showToast("Please confirm Bill / Ticket Terminal capability!");
       return;
     }
 
@@ -112,19 +119,19 @@ export const Registration: React.FC = () => {
                     <form id="flowScreen1" onSubmit={handleSubmit}>
                       <h2 className="card-heading text-center mb-3">Register Device</h2>
 
-                      {/* Setup Code Input */}
+                      {/* 1. TOP: Setup Code Input */}
                       <div className="mb-3">
                         <div className="d-flex justify-content-between align-items-center mb-1">
                           <label className="field-label mb-0" htmlFor="liveSignupCode">
-                            Setup Code
+                            SETUP CODE
                           </label>
                           <span
                             role="button"
-                            className="text-warning small"
+                            className="text-warning small d-flex align-items-center gap-1"
                             style={{ cursor: "pointer", fontSize: "0.78rem" }}
                             onClick={handleGenerateCode}
                           >
-                            <i className="fa-solid fa-shuffle me-1"></i> Generate
+                            <i className="fa-solid fa-shuffle"></i> Generate
                           </span>
                         </div>
                         <input
@@ -138,6 +145,9 @@ export const Registration: React.FC = () => {
                           }}
                           placeholder="WB-SHOP-XXXX"
                         />
+                        <div className="text-secondary small mt-1 text-start" style={{ fontSize: "0.74rem" }}>
+                          Shop name and machine name appear after Register.
+                        </div>
                         {errorMessage && (
                           <div
                             className="alert alert-danger py-2 px-3 mt-2 small text-light bg-danger bg-opacity-25 border-danger"
@@ -149,9 +159,9 @@ export const Registration: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Machine Type Selection */}
+                      {/* 2. DOWN: Device Type Selection */}
                       <div className="mb-3">
-                        <label className="field-label">Select Machine Type</label>
+                        <label className="field-label">DEVICE TYPE</label>
 
                         {/* Smart PC Option */}
                         <div
@@ -196,6 +206,71 @@ export const Registration: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Terminal Capability Confirmation Checkbox Field (Shown when Terminal is chosen) */}
+                      {machineType === "terminal" && (
+                        <div
+                          className="terminal-confirm-card mb-3 p-3 text-start position-relative overflow-hidden cursor-pointer"
+                          style={{
+                            backgroundColor: "#150734",
+                            border: isTerminalConfirmed ? "1px solid #8b3dff" : "1px solid #4c1d95",
+                            boxShadow: isTerminalConfirmed
+                              ? "0 0 16px rgba(139, 61, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05)"
+                              : "none",
+                            borderRadius: "12px",
+                            transition: "all 0.2s ease",
+                            animation: "modalSpringPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => setIsTerminalConfirmed((prev) => !prev)}
+                        >
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center gap-3">
+                              {/* Gold Ring Checkbox matching the radio dot style */}
+                              <div
+                                className="d-flex align-items-center justify-content-center"
+                                style={{
+                                  width: "20px",
+                                  height: "20px",
+                                  borderRadius: "50%",
+                                  border: isTerminalConfirmed ? "2px solid #f5b300" : "2px solid #6b5299",
+                                  boxShadow: isTerminalConfirmed ? "0 0 8px rgba(245, 179, 0, 0.5)" : "none",
+                                  backgroundColor: isTerminalConfirmed ? "#f5b300" : "transparent",
+                                  color: "#150734",
+                                  fontSize: "0.72rem",
+                                  fontWeight: 900,
+                                  flexShrink: 0,
+                                  transition: "all 0.2s ease",
+                                }}
+                              >
+                                {isTerminalConfirmed && <i className="fa-solid fa-check"></i>}
+                              </div>
+
+                              <div>
+                                <div className="fw-semibold text-light" style={{ fontSize: "0.92rem" }}>
+                                  Confirm: Bill / Ticket Terminal
+                                </div>
+                                <div className="small mt-0" style={{ fontSize: "0.76rem", color: "#a594c9" }}>
+                                  Prints cashout tickets · bill-in and ticket scan
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Badge matching the right-side option pill */}
+                            <span
+                              className={`badge border small px-2 py-1 ${
+                                isTerminalConfirmed
+                                  ? "border-warning-subtle text-warning"
+                                  : "border-secondary-subtle text-secondary"
+                              }`}
+                              style={{ fontSize: "0.7rem", background: "#1c093a" }}
+                            >
+                              <i className={`fa-solid ${isTerminalConfirmed ? "fa-check" : "fa-clock"} me-1`}></i>
+                              {isTerminalConfirmed ? "Confirmed" : "Pending"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Shop & Location Info */}
                       <div className="receipt-list mb-3">
                         <div className="receipt-row">
@@ -215,7 +290,7 @@ export const Registration: React.FC = () => {
                       {/* Button on Screen 1 */}
                       <div id="btnGroupScreen1">
                         <button type="submit" className="btn-winbet">
-                          <i className="fa-solid fa-circle-check me-1"></i> Register Machine
+                          <i className="fa-solid fa-circle-check me-1"></i> Register
                         </button>
                       </div>
                     </form>
